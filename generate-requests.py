@@ -1,10 +1,12 @@
 import requests
 import json
+import os
 import uuid
 import random
 import time
 
-API_ENDPOINT = "https://40govmfetj.execute-api.us-east-1.amazonaws.com/prod/tasks"
+API_ENDPOINT = os.getenv("API_GATEWAY") + "/tasks"
+ID_TOKEN = os.getenv("ID_TOKEN")
 
 def create_task(task_number):
     task = {
@@ -12,11 +14,18 @@ def create_task(task_number):
         "description": f"This is task number {task_number}",
         "status": "pending"
     }
-    response = requests.post(API_ENDPOINT, headers={"Content-Type": "application/json"}, data=json.dumps(task))
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": ID_TOKEN
+    }
+    response = requests.post(API_ENDPOINT, headers=headers, data=json.dumps(task))
     return response
 
 def get_task(task_id):
-    response = requests.get(f"{API_ENDPOINT}/{task_id}")
+    headers = {
+        "Authorization": ID_TOKEN
+    }
+    response = requests.get(f"{API_ENDPOINT}/{task_id}", headers=headers)
     return response
 
 def update_task(task_id):
@@ -25,11 +34,18 @@ def update_task(task_id):
         "description": "Updated description",
         "status": "completed"
     }
-    response = requests.put(f"{API_ENDPOINT}/{task_id}", headers={"Content-Type": "application/json"}, data=json.dumps(updated_task))
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": ID_TOKEN
+    }
+    response = requests.put(f"{API_ENDPOINT}/{task_id}", headers=headers, data=json.dumps(updated_task))
     return response
 
 def delete_task(task_id):
-    response = requests.delete(f"{API_ENDPOINT}/{task_id}")
+    headers = {
+        "Authorization": ID_TOKEN
+    }
+    response = requests.delete(f"{API_ENDPOINT}/{task_id}", headers=headers)
     return response
 
 def create_invalid_task():

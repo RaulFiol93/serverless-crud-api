@@ -6,6 +6,19 @@ dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table('TasksTable')
 
 def handler(event, context):
+    """
+    Lambda function handler to retrieve a task by its taskId from a DynamoDB table.
+    Parameters:
+    event (dict): The event dictionary containing request data. Expected to have 'pathParameters' with 'taskId'.
+    context (object): The context in which the Lambda function is called.
+    Returns:
+    dict: A dictionary containing the HTTP status code and the response body.
+        - 200: Task found, returns the task item.
+        - 400: Missing or invalid taskId in path parameters.
+        - 404: Task not found.
+        - 500: Internal server error.
+    """
+
     try:
         # Check if taskId is provided
         if 'pathParameters' not in event or 'taskId' not in event['pathParameters']:
@@ -33,6 +46,7 @@ def handler(event, context):
                 'body': json.dumps({'error': 'Task not found'})
             }
         return {
+            # Return a 200 status code and the task item
             'statusCode': 200,
             'body': json.dumps(item)
         }

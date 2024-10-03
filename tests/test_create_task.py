@@ -5,6 +5,7 @@ from lambdas.create_task import handler
 class TestCreateTask(unittest.TestCase):
     created_task_id = None
 
+    # 
     @classmethod
     def setUpClass(cls):
         event = {
@@ -12,14 +13,14 @@ class TestCreateTask(unittest.TestCase):
         }
         context = {}
         response = handler(event, context)
-        print("Create Task Response:", response)  # Debugging line
         response_body = json.loads(response['body'])
-        print("Create Task Response Body:", response_body)  # Debugging line
         cls.created_task_id = response_body['taskId']
 
+    # Test case to check if a task is successfully created
     def test_create_task_success(self):
         self.assertIsNotNone(TestCreateTask.created_task_id)
 
+    # Test case to check an error is returned when body is missing
     def test_create_task_missing_body(self):
         event = {"body": '{}'}
         context = {}

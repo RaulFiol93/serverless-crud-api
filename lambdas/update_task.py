@@ -1,17 +1,31 @@
 import json
 import boto3
 import uuid
-# import logging
 from botocore.exceptions import ClientError
 
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table('TasksTable')
 
-# logger = logging.getLogger()
-# logger.setLevel(logging.INFO)
-
 def handler(event, context):
-    # logger.info("Received event: %s", event)
+    """
+    Lambda function to update a task in a DynamoDB table.
+    Parameters:
+    event (dict): The event dictionary containing the request data.
+        - pathParameters (dict): Dictionary containing path parameters.
+            - taskId (str): The ID of the task to be updated.
+        - body (str): JSON string containing the task details to be updated.
+            - title (str): The new title of the task.
+            - description (str): The new description of the task.
+            - status (str): The new status of the task.
+    context (object): The context in which the function is called.
+    Returns:
+    dict: A dictionary containing the status code and response body.
+        - 200: If the task was successfully updated.
+        - 400: If missing key or invalid.
+        - 404: If the task was not found.
+        - 500: If an internal server error occurred.
+    """
+
     try:
         # Check if taskId is provided
         if 'pathParameters' not in event or 'taskId' not in event['pathParameters']:
@@ -62,19 +76,16 @@ def handler(event, context):
             'body': json.dumps(response['Attributes'])
         }
     except KeyError as e:
-        # logger.error("Missing key: %s", e)
         return {
             'statusCode': 400,
             'body': json.dumps({'error': f'Missing key: {e}'})
         }
     except ClientError as e:
-        # logger.error("ClientError: %s", e)
         return {
             'statusCode': 500,
             'body': json.dumps({'error': e.response['Error']['Message']})
         }
     except Exception as e:
-        # logger.error("Error: %s", e)
         return {
             'statusCode': 500,
             'body': json.dumps({'error': str(e)})
